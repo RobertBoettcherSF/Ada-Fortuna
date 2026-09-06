@@ -79,7 +79,7 @@ package Fortuna is
 private
    -- Represents a hash context accumulating entropy for a pool.
    type Hash_Context is record
-      State : Key_Type := (others => 0);
+      State : Key_Type := [others => 0];
       Count : Natural := 0;
    end record;
 
@@ -87,12 +87,12 @@ private
 
    type Fortuna_State is tagged record
       -- Generator state
-      Key          : Key_Type := (others => 0);
-      Counter      : Block_Type := (others => 0);
+      Key          : Key_Type := [others => 0];
+      Counter      : Block_Type := [others => 0];
       Seeded       : Boolean := False;
 
       -- Accumulator state
-      Pools        : Pool_Array := (others => (State => (others => 0), Count => 0));
+      Pools        : Pool_Array := [others => (State => [others => 0], Count => 0)];
       Reseed_Count : Interfaces.Unsigned_32 := 0;
    end record;
 
