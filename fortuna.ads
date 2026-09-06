@@ -1,28 +1,3 @@
-package body Fortuna is
-
-   use Interfaces;
-
-   ---------------------------------------------------------------------------
-   --  Internal SHA-256 Implementation (Self-Contained)
-   ---------------------------------------------------------------------------
-   H_Init : constant Hash_State :=
-     (16#6a09e667#, 16#bb67ae85#, 16#3c6ef372#, 16#a54ff53a#,
-      16#510e527f#, 16#9b05688c#, 16#1f83d9ab#, 16#5be0cd19#);
-
-   K_Const : constant array (0 .. 63) of Unsigned_32 :=
-     (16#428a2f98#, 16#71374491#, 16#b5c0fbcf#, 16#e9b5dba5#, 16#3956c25b#, 16#59f111f1#, 16#923f82a4#, 16#ab1c5ed5#,
-      16#d807aa98#, 16#12835b01#, 16#243185be#, 16#550c7dc3#, 16#72be5d74#, 16#80deb1fe#, 16#9bdc06a7#, 16#c19bf174#,
-      16#e49b69c1#, 16#efbe4786#, 16#0fc19dc6#, 16#240ca1cc#, 16#2de92c6f#, 16#4a7484aa#, 16#5cb0a9dc#, 16#76f988da#,
-      16#983e5152#, 16#a831c66d#, 16#b00327c8#, 16#bf597fc7#, 16#c6e00bf3#, 16#d5a79147#, 16#06ca6351#, 16#14292967#,
-      16#27b70a85#, 16#2e1b2138#, 16#4d2c6dfc#, 16#53380d13#, 16#650a7354#, 16#766a0abb#, 16#81c2c92e#, 16#92722c85#,
-      16#a2bfe8a1#, 16#a81a664b#, 16#c24b8b70#, 16#c76c51a3#, 16#d192e819#, 16#d6990624#, 16#f40e3585#, 16#106aa070#,
-      16#19a4c116#, 16#1e376c08#, 16#2748774c#, 16#34b0bcb5#, 16#391c0cb3#, 16#4ed8aa4a#, 16#5b9cca4f#, 16#682e6ff3#,
-      16#748f82ee#, 16#78a5636f#, 16#84c87814#, 16#8cc70208#, 16#90befffa#, 1Here is the complete, compilable Ada 2023 implementation of the Fortuna PRNG architecture. 
-
-It implements the Generator (with forward secrecy re-keying), the Entropy Accumulator (with 32 pools and cyclic distribution rules), and Seed File mechanisms. It models the core algorithm strictly according to the design specification while utilizing a structurally accurate internal cryptographic mock to remain independent and fully compilable without external C libraries.
-
-fortuna.ads
-```ada
 pragma Ada_2022;
 with Interfaces;
 
@@ -117,7 +92,7 @@ private
       Seeded       : Boolean := False;
 
       -- Accumulator state
-      Pools        : Pool_Array;
+      Pools        : Pool_Array := (others => (State => (others => 0), Count => 0));
       Reseed_Count : Interfaces.Unsigned_32 := 0;
    end record;
 
