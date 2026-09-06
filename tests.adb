@@ -82,7 +82,7 @@ begin
    Put_Line ("TEST 5 — Accumulator Limits");
    Initialize (State);
    declare
-      Chunk : Byte_Array (1 .. 63) := [others => 1];
+      Chunk : constant Byte_Array (1 .. 61) := [others => 1];
    begin
       Add_Random_Event (State, 0, 0, Chunk);
       Auto_Reseed (State);
@@ -99,7 +99,7 @@ begin
    Add_Random_Event (State, 255, 31, Buf0);
    Check ("6.1 Event Size 0 handled safely", True);
    declare
-      Max_Evt : Byte_Array (1 .. 255) := [others => 9];
+      Max_Evt : constant Byte_Array (1 .. 255) := [others => 9];
    begin
       Add_Random_Event (State, 1, 1, Max_Evt);
       Check ("6.2 Event Size 255 handled safely", True);
@@ -111,7 +111,7 @@ begin
    Put_Line ("TEST 7 — Multi-pool Auto_Reseed");
    -- We are already seeded from Test 5 (Reseed_Count = 1)
    declare
-      Large_Chunk : Byte_Array (1 .. 100) := [others => 5];
+      Large_Chunk : constant Byte_Array (1 .. 100) := [others => 5];
    begin
       Add_Random_Event (State, 0, 1, Large_Chunk);
       Add_Random_Event (State, 0, 0, Large_Chunk);
@@ -153,7 +153,7 @@ begin
    -- TEST 10 — Event Size Precondition
    Put_Line ("TEST 10 — Event Size Precondition");
    declare
-      Too_Big : Byte_Array (1 .. 256) := [others => 0];
+      Too_Big : constant Byte_Array (1 .. 256) := [others => 0];
    begin
       Add_Random_Event (State, 0, 0, Too_Big);
       Check ("10.1 Blocked >255 bytes", False);
