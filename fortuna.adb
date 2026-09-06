@@ -6,8 +6,6 @@ package body Fortuna is
 
    -- =========================================================================
    -- Internal Cryptographic Primitives
-   -- (These simulate AES-256 and SHA-256 structurally to ensure a fully 
-   -- compilable architecture without relying on external C libraries)
    -- =========================================================================
 
    procedure Update_Hash (Ctx : in out Hash_Context; Data : Byte_Array) is
@@ -55,12 +53,11 @@ package body Fortuna is
    -- =========================================================================
 
    procedure Initialize (State : out Fortuna_State) is
-      Empty_Hash : constant Hash_Context := (State => (others => 0), Count => 0);
    begin
       State := (Key          => (others => 0),
                 Counter      => (others => 0),
                 Seeded       => False,
-                Pools        => (others => Empty_Hash),
+                Pools        => (others => (State => (others => 0), Count => 0)),
                 Reseed_Count => 0);
    end Initialize;
 
@@ -70,7 +67,7 @@ package body Fortuna is
    end Is_Seeded;
 
    procedure Reseed (State : in out Fortuna_State; Seed : Byte_Array) is
-      Ctx : Hash_Context;
+      Ctx : Hash_Context := (State => (others => 0), Count => 0);
    begin
       -- Fortuna reseed: Hash(Key || Seed)
       Update_Hash (Ctx, State.Key);
@@ -87,7 +84,7 @@ package body Fortuna is
       Block         : Block_Type;
       Idx           : Natural := Result'First;
       Blocks_Needed : Natural;
-      New_Key       : Key_Type;
+      New_Key       : Key_Type := (others => 0);
       Key_Idx       : Natural;
    begin
       if not State.Seeded then
@@ -101,7 +98,8 @@ package body Fortuna is
       Blocks_Needed := (Length + 15) / 16;
 
       -- Fulfill the pseudo-random data request
-      for I in 1 .. Blocks_Needed loop
+      for Ignore in 1 .. Blocks_Needed loop
+         pragma Unreferenced (Ignore);
          Encrypt_Block (State.Key, State.Counter, Block);
          Increment_Counter (State.Counter);
          for J in Block'Range loop
@@ -114,7 +112,8 @@ package body Fortuna is
 
       -- Forward Secrecy: Rekey the generator immediately
       Key_Idx := New_Key'First;
-      for I in 1 .. 2 loop
+      for Ignore in 1 .. 2 loop
+         pragma Unreferenced (Ignore);
          Encrypt_Block (State.Key, State.Counter, Block);
          Increment_Counter (State.Counter);
          for J in Block'Range loop
@@ -141,7 +140,7 @@ package body Fortuna is
    end Add_Random_Event;
 
    procedure Auto_Reseed (State : in out Fortuna_State) is
-      Seed_Material : Byte_Array (1 .. 32 * 32); 
+      Seed_Material : Byte_Array (1 .. 32 * 32) := (others => 0); 
       Seed_Len      : Natural := 0;
       Pool_Hash     : Key_Type;
       Mask          : Unsigned_32;
