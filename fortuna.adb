@@ -54,10 +54,10 @@ package body Fortuna is
 
    procedure Initialize (State : out Fortuna_State) is
    begin
-      State := (Key          => (others => 0),
-                Counter      => (others => 0),
+      State := (Key          => [others => 0],
+                Counter      => [others => 0],
                 Seeded       => False,
-                Pools        => (others => (State => (others => 0), Count => 0)),
+                Pools        => [others => (State => [others => 0], Count => 0)],
                 Reseed_Count => 0);
    end Initialize;
 
@@ -67,7 +67,7 @@ package body Fortuna is
    end Is_Seeded;
 
    procedure Reseed (State : in out Fortuna_State; Seed : Byte_Array) is
-      Ctx : Hash_Context := (State => (others => 0), Count => 0);
+      Ctx : Hash_Context := (State => [others => 0], Count => 0);
    begin
       -- Fortuna reseed: Hash(Key || Seed)
       Update_Hash (Ctx, State.Key);
@@ -84,7 +84,7 @@ package body Fortuna is
       Block         : Block_Type;
       Idx           : Natural := Result'First;
       Blocks_Needed : Natural;
-      New_Key       : Key_Type := (others => 0);
+      New_Key       : Key_Type := [others => 0];
       Key_Idx       : Natural;
    begin
       if not State.Seeded then
@@ -140,7 +140,7 @@ package body Fortuna is
    end Add_Random_Event;
 
    procedure Auto_Reseed (State : in out Fortuna_State) is
-      Seed_Material : Byte_Array (1 .. 32 * 32) := (others => 0); 
+      Seed_Material : Byte_Array (1 .. 32 * 32) := [others => 0]; 
       Seed_Len      : Natural := 0;
       Pool_Hash     : Key_Type;
       Mask          : Unsigned_32;
@@ -157,7 +157,7 @@ package body Fortuna is
                Seed_Len := Seed_Len + 32;
                
                -- Reset consumed pool
-               State.Pools (I) := (State => (others => 0), Count => 0);
+               State.Pools (I) := (State => [others => 0], Count => 0);
             end if;
          end loop;
 
