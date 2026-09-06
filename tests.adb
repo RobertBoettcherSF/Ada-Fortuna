@@ -3,6 +3,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Fortuna;     use Fortuna;
 
 procedure Tests is
+   use type Fortuna.Byte; -- Resolves missing visibility for Unsigned_8 equality operators
+
    Pass_Count : Natural := 0;
    Fail_Count : Natural := 0;
 
@@ -43,7 +45,7 @@ begin
 
    -- TEST 2 — Manual Reseed
    Put_Line ("TEST 2 — Manual Reseed");
-   Reseed (State, (1 => 42, 2 => 43));
+   Reseed (State, [1 => 42, 2 => 43]);
    Check ("2.1 State is seeded", Is_Seeded (State));
    Generate_Random_Data (State, 10, Buf10);
    Check ("2.2 Generated 10 bytes", True);
@@ -80,12 +82,12 @@ begin
    Put_Line ("TEST 5 — Accumulator Limits");
    Initialize (State);
    declare
-      Chunk : Byte_Array (1 .. 63) := (others => 1);
+      Chunk : Byte_Array (1 .. 63) := [others => 1];
    begin
       Add_Random_Event (State, 0, 0, Chunk);
       Auto_Reseed (State);
       Check ("5.1 Auto_Reseed prevents < 64 bytes", not Is_Seeded (State));
-      Add_Random_Event (State, 0, 0, (1 => 2));
+      Add_Random_Event (State, 0, 0, [1 => 2]);
       Auto_Reseed (State);
       Check ("5.2 Auto_Reseed permits >= 64 bytes", Is_Seeded (State));
       Generate_Random_Data (State, 10, Buf10);
@@ -97,7 +99,7 @@ begin
    Add_Random_Event (State, 255, 31, Buf0);
    Check ("6.1 Event Size 0 handled safely", True);
    declare
-      Max_Evt : Byte_Array (1 .. 255) := (others => 9);
+      Max_Evt : Byte_Array (1 .. 255) := [others => 9];
    begin
       Add_Random_Event (State, 1, 1, Max_Evt);
       Check ("6.2 Event Size 255 handled safely", True);
@@ -109,7 +111,7 @@ begin
    Put_Line ("TEST 7 — Multi-pool Auto_Reseed");
    -- We are already seeded from Test 5 (Reseed_Count = 1)
    declare
-      Large_Chunk : Byte_Array (1 .. 100) := (others => 5);
+      Large_Chunk : Byte_Array (1 .. 100) := [others => 5];
    begin
       Add_Random_Event (State, 0, 1, Large_Chunk);
       Add_Random_Event (State, 0, 0, Large_Chunk);
@@ -151,7 +153,7 @@ begin
    -- TEST 10 — Event Size Precondition
    Put_Line ("TEST 10 — Event Size Precondition");
    declare
-      Too_Big : Byte_Array (1 .. 256) := (others => 0);
+      Too_Big : Byte_Array (1 .. 256) := [others => 0];
    begin
       Add_Random_Event (State, 0, 0, Too_Big);
       Check ("10.1 Blocked >255 bytes", False);
@@ -190,8 +192,8 @@ begin
    Put_Line ("TEST 13 — Independent States");
    Initialize (State);
    Initialize (State_B);
-   Reseed (State, (1 => 99, 2 => 100));
-   Reseed (State_B, (1 => 99, 2 => 100));
+   Reseed (State, [1 => 99, 2 => 100]);
+   Reseed (State_B, [1 => 99, 2 => 100]);
    declare
       Out_A : Byte_Array (1 .. 50);
       Out_B : Byte_Array (1 .. 50);
